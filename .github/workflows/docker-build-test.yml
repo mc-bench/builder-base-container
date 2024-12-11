@@ -13,6 +13,9 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -20,10 +23,8 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          push: false  # Don't push, just build to validate
+          push: false
+          platforms: linux/amd64,linux/arm64
           tags: mcbenchmark/minecraft-builder-base:pr-validation
           cache-from: type=registry,ref=mcbenchmark/minecraft-builder-base:latest
-          load: true   # Load the image into Docker engine
-
-      - name: Test image existence
-        run: docker image inspect mcbenchmark/minecraft-builder-base:pr-validation >/dev/null 2>&1
+          outputs: type=image,name=mcbenchmark/minecraft-builder-base:pr-validation,push=false
